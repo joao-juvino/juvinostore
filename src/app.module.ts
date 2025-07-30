@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ShopifyController } from './shopify/shopify.controller';
+import { ShopifyService } from './shopify/shopify.service';
 
 @Module({
   imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [ShopifyController],
+  providers: [ShopifyService],
 })
 export class AppModule {}
