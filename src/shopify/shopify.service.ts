@@ -60,7 +60,7 @@ export class ShopifyService {
         connectedAt: data.connectedAt,
       })
       .onConflictDoUpdate({
-        target: shops.shop, // campo que causa conflito (chave primária ou unique)
+        target: shops.shop,
         set: {
           accessToken: data.accessToken,
           connectedAt: data.connectedAt,
