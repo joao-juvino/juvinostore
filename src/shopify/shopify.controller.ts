@@ -4,6 +4,7 @@ import {
   Query,
   Res,
   BadRequestException,
+  Delete,
 } from '@nestjs/common';
 import { ShopifyService } from './shopify.service';
 import { Response } from 'express';
@@ -47,5 +48,28 @@ export class ShopifyController {
     }
 
     return res.send('App instalado com sucesso!');
+  }
+
+  @Get('webhooks')
+  async getWebhooks(@Query('shop') shop: string, @Res() res: Response) {
+    if (!shop) throw new BadRequestException('Shop param is required');
+
+    const shopData = await this.shopifyService.getShopFromDB(shop);
+    if (!shopData) throw new BadRequestException('Shop not found');
+
+    const webhooks = await this.shopifyService.listWebhooks(shop, shopData.accessToken);
+    return res.json(webhooks);
+  }
+
+  @Delete('webhooks')
+  async removeAllWebhooks(@Query('shop') shop: string, @Res() res: Response) {
+    if (!shop) throw new BadRequestException('Shop param is required');
+
+    const shopData = await this.shopifyService.getShopFromDB(shop);
+    if (!shopData) throw new BadRequestException('Shop not found');
+
+    await this.shopifyService.deleteAllWebhooks(shop, shopData.accessToken);
+
+    return res.json({ message: 'Todos os webhooks removidos com sucesso' });
   }
 }

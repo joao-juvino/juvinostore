@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import { db } from '../db/client';
 import { shops } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class ShopifyService {
@@ -104,6 +105,39 @@ export class ShopifyService {
       (w: any) => w.topic === topic && w.address === address
     );
   }
-  
+
+  async listWebhooks(shop: string, accessToken: string) {
+    const response = await axios.get(`https://${shop}/admin/api/2023-07/webhooks.json`, {
+      headers: {
+        'X-Shopify-Access-Token': accessToken,
+      },
+    });
+    return response.data.webhooks;
+  }
+
+  async deleteWebhook(shop: string, accessToken: string, webhookId: number) {
+    await axios.delete(`https://${shop}/admin/api/2023-07/webhooks/${webhookId}.json`, {
+      headers: {
+        'X-Shopify-Access-Token': accessToken,
+      },
+    });
+  }
+
+  async deleteAllWebhooks(shop: string, accessToken: string) {
+    const webhooks = await this.listWebhooks(shop, accessToken);
+    for (const webhook of webhooks) {
+      await this.deleteWebhook(shop, accessToken, webhook.id);
+    }
+  }
+
+  async getShopFromDB(shop: string) {
+    const result = await db
+      .select()
+      .from(shops)
+      .where(eq(shops.shop, shop))
+      .limit(1);
+    
+    return result[0];
+  }
   
 }
