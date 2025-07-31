@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: shopify_app
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: ${DB_PASS}
+      DB_NAME: shopify_app
+      SHOPIFY_API_KEY: ${SHOPIFY_API_KEY}
+      SHOPIFY_API_SECRET: ${SHOPIFY_API_SECRET}
+      SHOPIFY_SCOPES: ${SHOPIFY_SCOPES}
+      SHOPIFY_REDIRECT_URI: ${SHOPIFY_REDIRECT_URI}
+      WEBHOOK_ORDERS_CREATE_URL: ${WEBHOOK_ORDERS_CREATE_URL}
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: npm run start:dev
+    restart: unless-stopped
+
+volumes:
+  pgdata:
