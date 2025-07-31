@@ -37,6 +37,15 @@ export class ShopifyController {
       connectedAt: new Date(),
     });
 
-    return res.send('App installed com sucesso!');
+    const webhookUrl = process.env.WEBHOOK_ORDERS_CREATE_URL!;
+    
+    const exists = await this.shopifyService.isWebhookRegistered(shop, token, 'orders/create', webhookUrl);
+    if (!exists) {
+      await this.shopifyService.registerOrdersCreateWebhook(shop, token, webhookUrl);
+    } else {
+      console.log("Webhook orders/create já está registrado");
+    }
+
+    return res.send('App instalado com sucesso!');
   }
 }

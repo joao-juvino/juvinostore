@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as crypto from 'crypto';
+import { db } from '../db/client';
+import { shops } from '../db/schema';
 
 @Injectable()
 export class ShopifyService {
@@ -49,6 +51,59 @@ export class ShopifyService {
     accessToken: string;
     connectedAt: Date;
   }) {
-    console.log(data);
+    await db
+      .insert(shops)
+      .values({
+        shop: data.shop,
+        accessToken: data.accessToken,
+        connectedAt: data.connectedAt,
+      })
+      .onConflictDoUpdate({
+        target: shops.shop, // campo que causa conflito (chave primária ou unique)
+        set: {
+          accessToken: data.accessToken,
+          connectedAt: data.connectedAt,
+        },
+      });
+
   }
+
+  async registerOrdersCreateWebhook(shop: string, accessToken: string, webhookUrl: string) {
+    try {
+      const response = await axios.post(
+        `https://${shop}/admin/api/2023-07/webhooks.json`,
+        {
+          webhook: {
+            topic: 'orders/create',
+            address: webhookUrl,
+            format: 'json',
+          },
+        },
+        {
+          headers: {
+            'X-Shopify-Access-Token': accessToken,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Erro ao registrar webhook:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async isWebhookRegistered(shop: string, accessToken: string, topic: string, address: string) {
+    const response = await axios.get(`https://${shop}/admin/api/2023-07/webhooks.json`, {
+      headers: {
+        'X-Shopify-Access-Token': accessToken,
+      },
+    });
+    return response.data.webhooks.some(
+      (w: any) => w.topic === topic && w.address === address
+    );
+  }
+  
+  
 }
