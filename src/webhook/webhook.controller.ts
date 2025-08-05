@@ -4,7 +4,7 @@ import { WebhookService } from './webhook.service';
 
 @Controller('webhooks/orders')
 export class WebhookController {
-  constructor(private readonly webhookService: WebhookService) {}
+  constructor(private readonly webhookService: WebhookService) { }
 
   @Post('create')
   async handleOrderCreate(@Req() req: Request, @Res() res: Response) {
