@@ -1,98 +1,166 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🛍️ Juvino Store API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This repository provides a backend service to integrate with a Shopify store.
+Built with **NestJS**, **Drizzle ORM**, and **PostgreSQL**, and containerized with **Docker**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## ✨ Features
 
-## Description
+1. Authenticate with a Shopify store
+2. Register webhooks
+3. Handle incoming webhooks
+4. Manage customer orders
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 🚀 Getting Started
 
-```bash
-$ npm install
+### 1. Ngrok
+
+Para expor sua aplicação local na internet, você deve executar o ngrok e obter sua URL pública.
+
+Execute o comando abaixo, substituindo a porta pelo valor configurado na sua variável de ambiente `PORT` (por padrão, usamos a porta `3001`):
+
+```sh
+ngrok http 3001
 ```
 
-## Compile and run the project
+**Importante:** Use a URL pública gerada pelo ngrok para preencher as variáveis no seu arquivo `.env`. Além disso, essa mesma URL precisa ser configurada no painel do Shopify Partners, nos campos de callback da sua app.
 
-```bash
-# development
-$ npm run start
+O formato do callback URL deve ser:
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```txt
+https://<your-public-url>/auth/shopify/callback
 ```
 
-## Run tests
+### 2. Environment Variables
 
-```bash
-# unit tests
-$ npm run test
+First, copy the example environment file:
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```sh
+cp .env.example .env
 ```
 
-## Deployment
+Then fill in the required values in `.env`. Some are already pre-filled to simplify setup.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Variable                    | Description                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| `PORT`                      | Local API port (e.g., `3001`)                                                        |
+| `SHOPIFY_API_KEY`           | Your Shopify app's public key (from the Partners dashboard)                          |
+| `SHOPIFY_API_SECRET`        | Your Shopify app's private secret                                                    |
+| `SHOPIFY_SCOPES`            | Requested permissions, e.g., `read_products,write_products,read_orders,write_orders` |
+| `SHOPIFY_REDIRECT_URI`      | Shopify OAuth callback URL. Must match your app config                               |
+| `DB_HOST`                   | PostgreSQL host (e.g., `db` when using Docker)                                       |
+| `DB_PORT`                   | PostgreSQL port (default `5433`)                                                     |
+| `DB_USER`                   | Database username (usually `postgres`)                                               |
+| `DB_PASS`                   | Database password                                                                    |
+| `DB_NAME`                   | Name of the main database                                                            |
+| `WEBHOOK_ORDERS_CREATE_URL` | Public URL to receive `orders/create` webhook from Shopify                           |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### 3. Install Dependencies
+
+```sh
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Create the Database
 
-## Resources
+To create the database, run the following command:
 
-Check out a few resources that may come in handy when working with NestJS:
+```sh
+psql -h localhost -p 5433 -U postgres -c "CREATE DATABASE shopify_app;"
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+This will connect to your local PostgreSQL server and create a new database named `shopify_app`.
 
-## Support
+```markdown
+> 💡 You may be prompted to enter your PostgreSQL password.
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 5. Run Migrations
 
-## Stay in touch
+To generate and apply the database schema:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```sh
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 6. Start the App
+
+```sh
+npm run start:dev
+```
+
+---
+
+## 🧪 Running Tests
+
+### 1. Configure Environment Variables
+
+First, create a copy of the `.env` file for testing purposes:
+
+```sh
+cp .env .env.test
+```
+
+Then, update the following variables in the `.env.test` file to use your test database settings:
+
+```env
+DB_PORT=5434
+DB_PASS=<your-db-password>
+DB_NAME=shopify_app_test
+```
+
+### 2. Start the test database
+
+```sh
+docker compose up -d db_test
+```
+
+### 3. Prepare test DB
+
+Generate and run migrations for the test environment:
+
+```sh
+DOTENV_CONFIG_PATH=.env.test npx drizzle-kit generate
+DOTENV_CONFIG_PATH=.env.test npx drizzle-kit migrate
+```
+
+### 4. Run the tests
+
+* **Integration tests:**
+
+```sh
+NODE_ENV=test npm run test:e2e
+```
+
+* **Unit tests:**
+
+```sh
+npm run test
+```
+---
+
+## 🐳 Running with Docker
+
+To spin up the entire stack using Docker:
+
+```sh
+docker compose up -d
+```
+
+To generate and apply the database schema:
+
+```sh
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
+This will start:
+
+* `db` – the PostgreSQL database
+* `api` – the NestJS application
