@@ -225,3 +225,12 @@ This will start:
 
 * `db` – the PostgreSQL database
 * `api` – the NestJS application
+
+## 🛠️ Tech Stack
+
+- [NestJS](https://nestjs.com/)
+- [Drizzle ORM](https://orm.drizzle.team/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Docker](https://www.docker.com/)
+
+
