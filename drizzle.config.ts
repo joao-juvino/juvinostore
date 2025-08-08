@@ -14,5 +14,5 @@ export default {
     password: process.env.DB_PASS!,
     database: process.env.DB_NAME!,
   },
-  ssl: false,
+  ssl: true,
 };
