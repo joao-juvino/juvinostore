@@ -12,6 +12,67 @@ Built with **NestJS**, **Drizzle ORM**, and **PostgreSQL**, and containerized wi
 
 ---
 
+
+## 📚 API Endpoints
+
+### Shopify Authentication
+
+* **GET** `/auth/shopify?shop={shop}`
+  Redirects the user to Shopify’s authentication page.
+
+  * Query Parameters:
+
+    * `shop` (string) - Shopify store domain (e.g., `example.myshopify.com`)
+  * Response: Redirect to Shopify login.
+
+* **GET** `/auth/shopify/callback?shop={shop}&code={code}&hmac={hmac}`
+  Callback URL after Shopify authentication. Validates the store, exchanges the code for an access token, stores the shop info, and registers the webhook.
+
+  * Query Parameters:
+
+    * `shop` (string) - store domain
+    * `code` (string) - Shopify authorization code
+    * `hmac` (string) - security hash for verification
+  * Response: Success message.
+
+* **GET** `/auth/shopify/webhooks?shop={shop}`
+  Retrieves a list of all registered webhooks for the specified shop.
+
+  * Query Parameters:
+
+    * `shop` (string) - store domain
+  * Response: JSON list of webhooks.
+
+* **DELETE** `/auth/shopify/webhooks?shop={shop}`
+  Deletes all registered webhooks for the specified shop.
+
+  * Query Parameters:
+
+    * `shop` (string) - store domain
+  * Response: Success message.
+
+---
+
+### Orders
+
+* **GET** `/orders`
+  Returns a list of orders with details.
+
+  * Response: JSON array of orders.
+
+---
+
+### Webhooks
+
+* **POST** `/webhooks/orders/create`
+  Endpoint to receive Shopify order creation webhooks.
+
+  * Headers:
+
+    * `x-shopify-shop-domain` (string) - store domain sending the webhook
+  * Body: JSON payload with order data (from Shopify)
+  * Response: Confirmation message or validation error.
+
 ## 🚀 Getting Started
 
 ### 1. Ngrok
