@@ -11,7 +11,7 @@ import { Response } from 'express';
 
 @Controller('auth/shopify')
 export class ShopifyController {
-  constructor(private readonly shopifyService: ShopifyService) {}
+  constructor(private readonly shopifyService: ShopifyService) { }
 
   @Get()
   async redirectToShopify(@Query('shop') shop: string, @Res() res: Response) {
@@ -39,7 +39,7 @@ export class ShopifyController {
     });
 
     const webhookUrl = process.env.WEBHOOK_ORDERS_CREATE_URL!;
-    
+
     const exists = await this.shopifyService.isWebhookRegistered(shop, token, 'orders/create', webhookUrl);
     if (!exists) {
       await this.shopifyService.registerOrdersCreateWebhook(shop, token, webhookUrl);

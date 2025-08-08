@@ -1,5 +1,7 @@
 import { config } from 'dotenv';
-config();
+
+const path = process.env.DOTENV_CONFIG_PATH || '.env';
+config({ path });
 
 export default {
   schema: './src/db/schema.ts',

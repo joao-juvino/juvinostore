@@ -1,9 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import * as crypto from 'crypto';
-import { db } from '../db/client';
-import { customerAddresses, customers, orders } from '../db/schema';
-import { OrdersService } from 'src/orders/orders.service';
+import { OrdersService } from '../orders/orders.service';
 
 @Injectable()
 export class WebhookService {
@@ -20,6 +18,7 @@ export class WebhookService {
 
     return digest === hmacHeader;
   }
+
   async saveOrder(shop: string, payload: any) {
     await this.orderService.saveOrder(shop, payload);
   }
